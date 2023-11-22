@@ -3,7 +3,7 @@
 /data
 /.project
 .docker-sync
-/docker/.dock-data
+/.dock-data
 /docker/logs
 /jenkins/jenkins_home
 

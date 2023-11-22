@@ -1,22 +1,5 @@
 version: '3.7'
 services:
-  ### PHP #########################################
-  php:
-    build: ./docker/php
-    container_name: "laravel_vue_php"
-    volumes:
-      - ./:/var/www/webserver
-      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
-      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-
-  ### Node #########################################
-  node:
-    image: node:16.15.0
-    container_name: "laravel_vue_node"
-    volumes:
-      - ./:/webserver
-    working_dir: /webserver
-    tty: true
 
   ### NGINX #########################################
   nginx:
@@ -25,13 +8,22 @@ services:
     container_name: "laravel_vue_nginx"
     volumes:
       - ./:/var/www/webserver
-      - ./docker/logs/nginx/:/var/log/nginx
+      - ./.dock-data/logs/nginx/:/var/log/nginx
     ports:
       - "80:80"
       - "443:443"
 
-  ### Database #########################################
-  database:
+  ### WorkSpace #########################################
+  workspace:
+      build: ./docker/workspace
+      container_name: "laravel_vue_workspace"
+      volumes:
+        - ./:/var/www/webserver
+        - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+        - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+
+  ### MySQL #########################################
+  mysql:
     build:
       context: ./docker/mysql
     container_name: "laravel_vue_mysql"
@@ -42,8 +34,16 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - TZ=Asia/Tokyo
     volumes:
-      - ./docker/.dock-data/mysql:/var/lib/mysql
+      - ./.dock-data/mysql:/var/lib/mysql
+      - ./.dock-data/logs/mysql:/var/log/mysql
       - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./docker/logs/mysql:/var/log/mysql
     ports:
       - "3306:3306"
+
+  ### Radis #########################################
+  redis:
+      image: redis:6.0
+      volumes:
+          - ./.dock-data/redis:/data
+      ports:
+          - "6379:6379"
